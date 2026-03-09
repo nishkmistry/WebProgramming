@@ -1,0 +1,26 @@
+<html>
+<body>
+<form id="form" action="/" method="GET" onsubmit="validateForm()">
+<label> Name: </label>
+<input type="text" id="Name" placeholder="Enter Name">
+<br>
+<label> Email: </label>
+<input type="email" id="Email" placeholder="Enter Email"><br>
+<label> Password: </label>
+<input type="password" id="Password" placeholder="Enter Password"><br>
+
+<input type="Submit" id="submit">
+</form>
+<script>
+function validateForm(){
+let name=document.getElementById("Name").value;
+let email=document.getElementById("Email").value;
+let password=document.getElementById("Password").value;
+if(name === "" || email === "" || password === ""){
+alert("Fields cannot be empty.");
+}
+}
+</script>
+
+</body>
+</html>

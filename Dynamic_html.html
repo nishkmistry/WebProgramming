@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <button onclick="Create()"> Click Me!</button>
+        <div id="E"></div>
+        <script>
+            function Create(){
+                let x = document.createElement('p');
+                    x.innerHTML = "Nishk";
+                document.getElementById("E").appendChild(x);
+                x = document.createElement('br');
+                document.getElementById('E').appendChild(x);
+                return 0;
+            }
+        </script>
+    </body>
+</html>

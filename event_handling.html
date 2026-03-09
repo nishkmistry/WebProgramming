@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <button onclick="singleclick()">
+            Click Me!
+        </button>
+        <br>
+        <button ondblclick="doubleclick()">
+            Double Click Me!
+        </button>
+        <br> 
+<button onmouseover="MouseOver()">
+Hover me!
+</button>
+<br>
+<button onkeyup="KeyPressed()">
+    Key Press !
+</button>
+<br>
+<script>
+    function singleclick(){
+        console.log("Single click detected.");
+    }
+    function doubleclick(){
+        console.log("Double click detected.");
+    }
+    function MouseOver(){
+        console.log("Someone Hovered me.");
+    }
+    function KeyPressed(){
+        console.log("Don't Press me!");
+    }
+</script>
+</html>

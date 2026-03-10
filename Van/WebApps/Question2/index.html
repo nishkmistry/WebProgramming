@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supermarket Billing</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h2 { text-align: center; color: #e67e22; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
+        .header-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
+        
+        .product-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        
+        button { background: #e67e22; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #d35400; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .qty-btn { padding: 4px 8px; margin: 0 5px; background: #3498db; }
+        .qty-btn:hover { background: #2980b9; }
+        .remove-btn { background: #e74c3c; }
+        .remove-btn:hover { background: #c0392b; }
+
+        input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        #checkoutSection { margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee; }
+        .section-title { border-bottom: 2px solid #e67e22; padding-bottom: 5px; margin-bottom: 15px; color: #e67e22; }
+        
+        #billSummary { background: #fdf2e9; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #fae5d3; }
+        .product-info h4 { margin: 0 0 5px 0; }
+        .product-info p { margin: 0; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Online Supermarket</h2>
+        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="Supermarket" class="header-img">
+        
+        <h3 class="section-title">Available Products</h3>
+        <div id="productsList"></div>
+        
+        <h3 class="section-title">Your Cart</h3>
+        <div id="cartSection">
+            <div id="cartItems"><i>Cart is empty</i></div>
+        </div>
+        
+        <div id="checkoutSection">
+            <h3 class="section-title">Customer Details</h3>
+            <input type="text" id="cName" placeholder="Full Name" required> 
+            <input type="text" id="cPhone" placeholder="Phone Number (10 digits)" required> 
+            <input type="email" id="cEmail" placeholder="Email Address" required> 
+            <input type="text" id="cAddress" placeholder="Delivery Address" required> 
+            <button onclick="checkout()" style="width: 100%; padding: 12px; font-size: 16px;">Checkout & Generate Bill</button>
+        </div>
+        
+        <div id="billSummary" style="display:none;"></div>
+    </div>
+
+    <!-- Override render functions slightly to inject styles nicely -->
+    <script src="script.js"></script>
+    <script>
+        const originalRenderProducts = renderProducts;
+        renderProducts = function() {
+            const list = document.getElementById('productsList');
+            list.innerHTML = '';
+            products.forEach(p => {
+                list.innerHTML += `
+                <div class="product-card">
+                    <div class="product-info">
+                        <h4>${p.name}</h4>
+                        <p>₹${p.price} | Stock: ${p.stock}</p>
+                    </div>
+                    <button onclick="addToCart('${p.id}')" ${p.stock === 0 ? 'disabled' : ''}>Add to Cart</button>
+                </div>`;
+            });
+        };
+        
+        const originalRenderCart = renderCart;
+        renderCart = function() {
+            const cartDiv = document.getElementById('cartItems');
+            cartDiv.innerHTML = '';
+            if (cart.length === 0) {
+                cartDiv.innerHTML = '<i>Cart is empty</i>';
+                return;
+            }
+            cart.forEach(c => {
+                cartDiv.innerHTML += `
+                <div class="cart-item">
+                    <span><b>${c.name}</b> (Qty: ${c.qty})</span>
+                    <div>
+                        <button class="qty-btn" onclick="updateQty('${c.id}', -1)">-</button>
+                        <button class="qty-btn" onclick="updateQty('${c.id}', 1)">+</button>
+                        <button class="remove-btn" onclick="removeFromCart('${c.id}')">Remove</button>
+                    </div>
+                </div>`;
+            });
+        };
+
+        const originalCheckout = checkout;
+        checkout = function() {
+            originalCheckout();
+            if(document.getElementById('billSummary').innerHTML.trim() !== '') {
+                document.getElementById('billSummary').style.display = 'block';
+            }
+        };
+
+        renderProducts();
+    </script>
+</body>
+</html>

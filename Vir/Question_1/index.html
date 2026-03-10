@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TNEB Billing</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }
+        #formContainer { background: #fff; padding: 20px; max-width: 400px; margin: auto; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; margin: 5px 0; background-color: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #billDisplay { display: none; width: 100px; height: 100px; border-radius: 50%; background-color: blue; color: yellow; text-align: center; line-height: 100px; margin: 20px auto; font-size: 20px; font-weight: bold; }
+        #revenueDisplay { margin-top: 15px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+        <h2>TNEB Billing System</h2>
+        <input type="text" id="custName" placeholder="Customer Name">
+        <input type="number" id="units" placeholder="Units Consumed" min="0">
+        <button onclick="processBill()">Calculate Bill</button>
+        <button onclick="showRevenue()">Show Total Revenue</button>
+        <div id="billDisplay"></div>
+        <div id="revenueDisplay"></div>
+    </div>
+
+    <script>
+        let customers = [];
+        let totalRevenue = 0;
+
+        function calculateBill(units) {
+            let bill = 0;
+            if (units <= 100) {
+                bill = units * 2;
+            } else if (units <= 200) {
+                bill = (100 * 2) + ((units - 100) * 3);
+            } else {
+                bill = (100 * 2) + (100 * 3) + ((units - 200) * 5);
+            }
+            return bill;
+        }
+
+        function processBill() {
+            let name = document.getElementById('custName').value;
+            let units = parseInt(document.getElementById('units').value);
+            
+            if (isNaN(units) || units < 0) {
+                alert("Please enter valid units consumed.");
+                return;
+            }
+            
+            let bill = calculateBill(units);
+            customers.push({name, units, bill});
+            totalRevenue += bill;
+
+            let display = document.getElementById('billDisplay');
+            display.style.display = 'block';
+            display.innerHTML = "₹" + bill;
+
+            let formBg = document.getElementById('formContainer');
+            if (units < 100) {
+                formBg.style.backgroundColor = 'lightgreen';
+            } else if (units >= 100 && units <= 200) {
+                formBg.style.backgroundColor = 'orange';
+            } else {
+                formBg.style.backgroundColor = 'lightcoral';
+            }
+        }
+
+        function showRevenue() {
+            document.getElementById('revenueDisplay').innerHTML = "Total revenue collected: ₹" + totalRevenue;
+        }
+    </script>
+</body>
+</html>

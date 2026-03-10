@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Gauge</title>
+    <style>
+        body { font-family: 'Trebuchet MS', Arial, sans-serif; background-color: #e9ecef; margin: 0; padding: 40px 20px; }
+        #formContainer { background-color: #fff; max-width: 400px; margin: 0 auto; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        h2 { text-align: center; color: #0056b3; margin-top: 0; }
+        label { display: block; margin-bottom: 5px; color: #495057; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ced4da; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background-color: #007bff; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        #statusBox { display: none; padding: 20px; border-radius: 5px; margin-top: 20px; text-align: center; font-size: 18px; font-weight: bold; color: white; }
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+        <h2>Loan Eligibility Gauge</h2>
+        
+        <label for="income">Monthly Income (₹)</label>
+        <input type="number" id="income" placeholder="e.g. 50000" min="1">
+        
+        <label for="loanReq">Requested EMI Amount (₹) / Loan Amount</label>
+        <input type="number" id="loanReq" placeholder="e.g. 15000" min="1">
+        
+        <button onclick="calculateEMI()">Check Eligibility</button>
+        
+        <div id="statusBox"></div>
+    </div>
+
+    <script>
+        function validateInput(val) {
+            return val > 0;
+        }
+
+        function calculateMaxEMI(income) {
+            return income * 0.40;
+        }
+
+        function calculateEMI() {
+            let income = parseFloat(document.getElementById('income').value);
+            let loanReq = parseFloat(document.getElementById('loanReq').value);
+            
+            if (!validateInput(income) || !validateInput(loanReq) || isNaN(income) || isNaN(loanReq)) {
+                alert("Inputs must be numeric and greater than 0");
+                return;
+            }
+            
+            let maxEmi = calculateMaxEMI(income);
+            let isApproved = income >= (2 * maxEmi); 
+            
+            let box = document.getElementById('statusBox');
+            box.style.display = 'block';
+            
+            if (isApproved) {
+                box.style.backgroundColor = 'blue';
+                box.style.color = 'yellow';
+                box.innerHTML = "Approval: Loan Eligibility Confirmed";
+            } else {
+                box.style.backgroundColor = 'red';
+                box.style.color = 'yellow';
+                box.innerHTML = "Rejection: Not Eligible for Loan";
+            }
+        }
+    </script>
+</body>
+</html>

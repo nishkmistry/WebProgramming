@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Commerce Cart</title>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; background-color: #f8f9fa; padding: 20px; }
+        #formContainer { background: #ffffff; padding: 25px; max-width: 500px; margin: auto; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        label { font-weight: bold; font-size: 14px; color: #555; }
+        select, input { width: 100%; padding: 10px; margin: 8px 0 15px 0; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; margin: 5px 0; background-color: #6f42c1; border: none; color: white; border-radius: 4px; cursor: pointer; font-size: 15px; }
+        button:hover { background-color: #5936a2; }
+        .danger-btn { background-color: #dc3545; }
+        .danger-btn:hover { background-color: #c82333; }
+        .row { display: flex; justify-content: space-between; gap: 10px; }
+        .row button { width: 48%; }
+        .section-divider { border-top: 1px solid #ddd; margin: 20px 0; }
+        #finalBox { display: none; width: 150px; height: 150px; background-color: #dc3545; color: white; margin: 20px auto; padding: 10px; border-radius: 8px; text-align: center; flex-direction: column; justify-content: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+        <h2>E-Commerce Cart</h2>
+        
+        <label for="productList">Select Product:</label>
+        <select id="productList" onchange="updateCart()">
+            <option value="1000">Product 1 - ₹1000</option>
+            <option value="5000">Product 2 - ₹5000</option>
+        </select>
+        
+        <label for="qty">Quantity:</label>
+        <input type="number" id="qty" value="1" min="1" onchange="updateCart()">
+        
+        <div class="row">
+            <button onclick="removeCartItem()">Remove from Cart</button>
+            <button class="danger-btn" onclick="deleteProduct()">Delete Product</button>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <label>Add New Product to List:</label>
+        <input type="text" id="newProdName" placeholder="New Product Name">
+        <input type="number" id="newProdPrice" placeholder="New Price (₹)">
+        <button onclick="addProduct()">Add Product</button>
+        
+        <div class="section-divider"></div>
+        
+        <button onclick="checkout()" style="background-color: #28a745; font-size: 16px;">Checkout</button>
+        <div id="finalBox" style="display:none;"></div>
+    </div>
+
+    <script>
+        let cartItemTotal = 0;
+        let finalAmount = 0;
+
+        function updateCart() {
+            let list = document.getElementById('productList');
+            if (list.selectedIndex === -1) {
+                cartItemTotal = 0;
+                finalAmount = 0;
+                return;
+            }
+            
+            let price = parseFloat(list.value);
+            let qty = parseInt(document.getElementById('qty').value);
+            
+            if (isNaN(price) || isNaN(qty) || qty < 1) return;
+            
+            cartItemTotal = price * qty;
+            let gst = cartItemTotal * 0.18;
+            finalAmount = cartItemTotal + gst;
+        }
+
+        function checkout() {
+            if (cartItemTotal === 0) {
+                alert("Cart is empty or no product selected!");
+                return;
+            }
+            
+            let message = "Discount not applicable";
+            let amountToPay = finalAmount;
+            
+            if (amountToPay > 5000) {
+                amountToPay -= amountToPay * 0.10; // 10% discount
+                message = "10% Discount Applied!";
+            }
+            
+            let box = document.getElementById('finalBox');
+            box.style.display = 'flex';
+            box.innerHTML = `<span>Final Amount:<br>₹${amountToPay.toFixed(2)}</span><br><span style="font-size: 12px; margin-top:10px;">${message}</span>`;
+        }
+
+        function removeCartItem() {
+            cartItemTotal = 0;
+            finalAmount = 0;
+            document.getElementById('finalBox').style.display = 'none';
+            document.getElementById('qty').value = 1;
+            alert("Product removed from temporary cart");
+        }
+
+        function deleteProduct() {
+            let list = document.getElementById('productList');
+            if (list.selectedIndex >= 0) {
+                list.remove(list.selectedIndex);
+                updateCart();
+            } else {
+                alert("No product to delete!");
+            }
+            document.getElementById('finalBox').style.display = 'none';
+        }
+
+        function addProduct() {
+            let name = document.getElementById('newProdName').value;
+            let price = document.getElementById('newProdPrice').value;
+            
+            if (!name || !price || parseFloat(price) <= 0) {
+                alert("Please enter a valid product name and price.");
+                return;
+            }
+            
+            let list = document.getElementById('productList');
+            let option = document.createElement("option");
+            option.text = `${name} - ₹${price}`;
+            option.value = price;
+            list.add(option);
+            
+            document.getElementById('newProdName').value = '';
+            document.getElementById('newProdPrice').value = '';
+            
+            alert("New product added to the list!");
+            if(list.options.length === 1) {
+                updateCart();
+            }
+        }
+        
+        window.onload = updateCart;
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Fine Calculation</title>
+    <style>
+        body { font-family: 'Georgia', serif; background-color: #f0e9df; color: #333; display: flex; justify-content: center; padding: 30px 10px; margin: 0; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 500px; border-top: 5px solid #8b4513; }
+        h2 { text-align: center; color: #8b4513; margin-top: 0; }
+        .header-img { width: 100%; height: 180px; object-fit: cover; border-radius: 5px; margin-bottom: 20px; }
+        
+        label { font-weight: bold; color: #555; display: block; margin-top: 10px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        button { background: #8b4513; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #a0522d; }
+        
+        #result { margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 5px; border: 1px solid #ddd; text-align: center; display: none; }
+        .fine-box { background-color: #d9534f; color: white; padding: 15px; border: 2px solid #c9302c; display: inline-block; margin-top: 10px; border-radius: 4px; font-weight: bold; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Library Desk</h2>
+        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80" alt="Library" class="header-img">
+        
+        <form id="libForm">
+            <label>Student Name</label>
+            <input type="text" id="sName" placeholder="Enter Full Name" required>
+            
+            <label>Registration Number</label>
+            <input type="text" id="regNo" placeholder="Format: REG2025XXXX" required>
+            
+            <label>Book Title</label>
+            <input type="text" id="bTitle" placeholder="Name of the book" required>
+            
+            <label>Issue Date</label>
+            <input type="date" id="iDate" required>
+            
+            <label>Return Date</label>
+            <input type="date" id="rDate" required>
+            
+            <button type="button" onclick="calculateFine()">Calculate Fine</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let borrowedBooks = []; 
+
+        function calculateFine() {
+            const name = document.getElementById('sName').value;
+            const reg = document.getElementById('regNo').value;
+            const iDateVal = document.getElementById('iDate').value;
+            const rDateVal = document.getElementById('rDate').value;
+            
+            if (!iDateVal || !rDateVal) return alert("Please select both dates.");
+
+            const issueDate = new Date(iDateVal);
+            const returnDate = new Date(rDateVal);
+
+            if (!/^[A-Za-z\s]+$/.test(name)) return alert("Name must contain alphabets only.");
+            if (!/^REG2025\d{4}$/.test(reg)) return alert("Registration number must follow format REG2025XXXX.");
+            if (returnDate <= issueDate) return alert("Return date must be later than the issue date.");
+            
+            if (borrowedBooks.length >= 3) return alert("Maximum 3 books calculation limit reached.");
+
+            const diffTime = Math.abs(returnDate - issueDate);
+            const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+            let fine = 0;
+            let finePerDayDesc = "₹0/day";
+
+            if (days <= 7) {
+                fine = 0;
+            } else if (days <= 14) {
+                fine = (days - 7) * 5;
+                finePerDayDesc = "₹5/day (after 7 days)";
+            } else {
+                fine = (7 * 5) + ((days - 14) * 10);
+                finePerDayDesc = "₹10/day (after 14 days)";
+            }
+
+            if (days > 30) {
+                fine += 200;
+                finePerDayDesc += " + ₹200 Penalty";
+            }
+
+            borrowedBooks.push({ title: document.getElementById('bTitle').value, fine: fine });
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <p><b>Book:</b> ${document.getElementById('bTitle').value}</p>
+                <p><b>Borrow Duration:</b> ${days} days</p>
+                <p><b>Fine Tier Applied:</b> ${finePerDayDesc}</p>
+                <div class="fine-box">Total Fine: ₹${fine}</div> 
+            `;
+        }
+    </script>
+</body>
+</html>

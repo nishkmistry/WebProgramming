@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Order</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eaeaea; padding: 20px; }
+        #formContainer { background: #fff; padding: 25px; max-width: 450px; margin: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        h2 { text-align: center; color: #444; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 48%; padding: 10px; margin: 5px 1%; background-color: #28a745; border: none; color: white; border-radius: 5px; cursor: pointer; display: inline-block; box-sizing: border-box; }
+        button:hover { background-color: #218838; }
+        button.action-btn { width: 100%; margin: 5px 0; background-color: #17a2b8; }
+        button.action-btn:hover { background-color: #138496; }
+        #billDisplay { display: none; background-color: #fff3cd; color: #856404; padding: 20px; border: 1px solid #ffeeba; border-radius: 5px; margin-top: 20px; text-align: center; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+        <h2>Restaurant Order System</h2>
+        <input type="text" id="custName" placeholder="Customer Name">
+        <input type="number" id="age" placeholder="Age" onchange="checkAge()" min="1">
+        
+        <select id="foodItem">
+            <option value="Pizza">Pizza</option>
+            <option value="Salad">Salad</option>
+            <option value="Smoothies">Smoothies</option>
+        </select>
+        
+        <input type="number" id="price" placeholder="Price (₹)" min="0">
+        <input type="number" id="qty" placeholder="Quantity" min="1">
+        
+        <div>
+            <button onclick="addToCart()">Add to Cart</button>
+            <button onclick="placeOrder()">Place Order</button>
+        </div>
+        <button class="action-btn" onclick="clearForm()">Clear Form</button>
+        <button class="action-btn" onclick="colorInputs()">Color Inputs Green</button>
+        
+        <div id="billDisplay"></div>
+    </div>
+
+    <script>
+        let cart = [];
+
+        function checkAge() {
+            let age = parseInt(document.getElementById('age').value);
+            let dropdown = document.getElementById('foodItem');
+            
+            if (age > 50) {
+                for(let i=0; i < dropdown.options.length; i++){
+                    if(dropdown.options[i].value === 'Pizza') {
+                        dropdown.remove(i);
+                        break;
+                    }
+                }
+            } else {
+                let hasPizza = false;
+                for(let i=0; i < dropdown.options.length; i++){
+                    if(dropdown.options[i].value === 'Pizza') hasPizza = true;
+                }
+                if(!hasPizza) {
+                    let opt = document.createElement('option');
+                    opt.value = 'Pizza';
+                    opt.text = 'Pizza';
+                    dropdown.add(opt, 0);
+                }
+            }
+        }
+
+        function itemTotal(price, qty) {
+            return price * qty;
+        }
+
+        function grandTotal() {
+            return cart.reduce((sum, item) => sum + item.total, 0);
+        }
+
+        function addToCart() {
+            let item = document.getElementById('foodItem').value;
+            let p = parseFloat(document.getElementById('price').value);
+            let q = parseInt(document.getElementById('qty').value);
+            
+            if (isNaN(p) || isNaN(q) || p <= 0 || q <= 0) {
+                alert("Please enter valid price and quantity.");
+                return;
+            }
+            
+            let total = itemTotal(p, q);
+            cart.push({item, p, q, total});
+            alert(item + " added to cart!");
+        }
+
+        function placeOrder() {
+            if (cart.length === 0) {
+                alert("Cart is empty! Add some items first.");
+                return;
+            }
+            let totalBill = grandTotal();
+            let display = document.getElementById('billDisplay');
+            display.style.display = 'block';
+            display.innerHTML = "Grand Total Bill: ₹" + totalBill.toFixed(2);
+        }
+
+        function clearForm() {
+            document.getElementById('custName').value = '';
+            document.getElementById('age').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('qty').value = '';
+            
+            let inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
+            inputs.forEach(inp => inp.style.backgroundColor = 'white');
+            
+            document.getElementById('billDisplay').style.display = 'none';
+        }
+
+        function colorInputs() {
+            let inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
+            inputs.forEach(inp => inp.style.backgroundColor = 'lightgreen');
+        }
+    </script>
+</body>
+</html>

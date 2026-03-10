@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hackathon Registration</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2f; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: #2a2a40; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); width: 100%; max-width: 600px; }
+        h2 { text-align: center; color: #00bcd4; margin-top: 0; }
+        .header-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; border: 2px solid #00bcd4; }
+        
+        .event-card { background: #33334d; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #00bcd4; cursor: pointer; transition: 0.3s; }
+        .event-card:hover { background: #3d3d5c; }
+        .event-card label { cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; width: 100%; }
+        .event-details { font-size: 14px; color: #aaa; margin-left: 25px; margin-top: 5px; }
+        
+        input { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #444; border-radius: 5px; background: #1e1e2f; color: #fff; box-sizing: border-box; }
+        input:focus { outline: none; border-color: #00bcd4; }
+        
+        button { background: #00bcd4; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0097a7; }
+        
+        h3 { border-bottom: 1px solid #444; padding-bottom: 10px; color: #00bcd4; }
+        
+        #summary { margin-top: 20px; padding: 15px; background: #1a4a4f; border-radius: 5px; border: 1px solid #00bcd4; display: none; }
+        #summary p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Techfest Registration</h2>
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="Hackathon" class="header-img">
+        
+        <h3>Select Event</h3>
+        <div id="eventsContainer"></div>
+        
+        <h3>Team Details</h3>
+        <form id="regForm">
+            <input type="text" id="pName" placeholder="Participant/Team Leader Name" required>
+            <input type="text" id="pCollege" placeholder="College Name" required>
+            <input type="email" id="pEmail" placeholder="Email Address" required>
+            <input type="text" id="pMobile" placeholder="Mobile Number" required>
+            <input type="number" id="pTeamSize" placeholder="Team Size (1-4)" min="1" max="4" required>
+            <button type="button" onclick="register()">Register Now</button>
+        </form>
+        
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        const events = [
+            { id: 'E1', name: 'CodeWar', date: '2025-11-01', time: '10:00', fee: 500, limit: 20, registered: 19 },
+            { id: 'E2', name: 'AppDev', date: '2025-11-01', time: '10:00', fee: 400, limit: 30, registered: 10 },
+            { id: 'E3', name: 'AI Sprint', date: '2025-11-02', time: '14:00', fee: 600, limit: 25, registered: 15 }
+        ];
+        
+        let selectedEventId = null;
+        let userEvents = [];
+
+        function renderEvents() {
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = '';
+            events.forEach(e => {
+                const isFull = e.registered >= e.limit;
+                container.innerHTML += `
+                    <div class="event-card" ${isFull ? 'style="opacity: 0.5; cursor:not-allowed;"' : ''}>
+                        <label>
+                            <input type="radio" name="eventSel" value="${e.id}" onchange="selectedEventId='${e.id}'" ${isFull ? 'disabled' : ''}>
+                            ${e.name} ${isFull ? '(FULL)' : ''}
+                        </label>
+                        <div class="event-details">
+                            Date: ${e.date} | Time: ${e.time} <br>
+                            Fee: ₹${e.fee} | Seats Left: ${e.limit - e.registered}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function register() {
+            if (!selectedEventId) return alert("Select an event");
+            
+            const name = document.getElementById('pName').value;
+            const email = document.getElementById('pEmail').value;
+            const mobile = document.getElementById('pMobile').value;
+            const teamSize = parseInt(document.getElementById('pTeamSize').value);
+
+            if (!/^[A-Za-z\s]+$/.test(name)) return alert("Name must contain only alphabets.");
+            if (!/^\S+@\S+\.\S+$/.test(email)) return alert("Email format is invalid.");
+            if (!/^\d{10}$/.test(mobile)) return alert("Mobile number must be exactly 10 digits.");
+            if (teamSize < 1 || teamSize > 4 || isNaN(teamSize)) return alert("Team size must be between 1 and 4.");
+
+            const ev = events.find(e => e.id === selectedEventId);
+
+            if (userEvents.some(u => u.time === ev.time && u.date === ev.date)) {
+                return alert("Time slot clash! You are already registered for an event at this time.");
+            }
+
+            let baseFee = ev.fee * teamSize;
+            let discount = 0;
+            if (teamSize >= 3) discount = baseFee * 0.10;
+            
+            let preTax = baseFee - discount;
+            let tax = preTax * 0.18; 
+            let total = preTax + tax;
+
+            ev.registered += 1;
+            userEvents.push(ev);
+
+            const regId = "REG" + Date.now();
+            
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            summaryDiv.innerHTML = `
+                <h3 style="margin-top:0; border-bottom: 1px solid #00bcd4;">Registration Successful!</h3>
+                <p><b>Reg ID:</b> ${regId}</p>
+                <p><b>Event:</b> ${ev.name}</p>
+                <p><b>Team Size:</b> ${teamSize}</p>
+                <p><b>Base Fee:</b> ₹${baseFee}</p>
+                <p><b>Discount:</b> -₹${discount.toFixed(2)}</p>
+                <p><b>GST (18%):</b> ₹${tax.toFixed(2)}</p>
+                <p style="font-size: 18px; color: #00bcd4; margin-top: 10px;"><b>Final Amount: ₹${total.toFixed(2)}</b></p>
+            `;
+            
+            document.getElementById('regForm').reset();
+            selectedEventId = null;
+            renderEvents();
+        }
+        renderEvents();
+    </script>
+</body>
+</html>
